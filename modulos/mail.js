@@ -1,20 +1,12 @@
 /**
-*
-* Desarrollo para CLIMO que revisa el Inbox de gmail en busca de emails enviados
-* desde el formulario de contacto, y según cierto criterio envía respuestas automáticas.
-*
-* @author seb
-*/
+ * Modulo de email
+ *
+ * @author seb
+ */
 
-  /////// CONFIG ///////////////////
+const log = require('../util/log')('MAIL');
 
-  var HoraInicio = 21;
-  var HoraCierre = 22;
-
-  //////////////////////////////////
-
-
-
+function mail() {
   var util = require('util');
   var POP3Client = require('poplib');
   var mailgun = require('mailgun-js')({apiKey: 'key-4f62ca6ebe491376f6411bf49cbff872', domain: 'climino.com'});
@@ -47,10 +39,10 @@
         to: GLOBAL.persona.email,
         message: message.toString('ascii')
       };
-      console.log('enviando a ', GLOBAL.persona.email);
+      log('enviando a ', GLOBAL.persona.email);
       mailgun.messages().sendMime(dataToSend, function (sendError, body) {
         if (sendError) {
-          console.log(sendError);
+          log(sendError);
           return;
         }
       });
@@ -60,38 +52,38 @@
 
   client.on('error', function (err) {
 
-    if (err.errno === 111) console.log('Unable to connect to server');
-    else console.log('Server error occurred');
+    if (err.errno === 111) log('Unable to connect to server');
+    else log('Server error occurred');
 
-    console.log(err);
+    log(err);
 
   });
 
   client.on('connect', function (rawdata) {
 
-    console.log('CONNECT success');
+    log('CONNECT success');
     client.login(username, password);
 
   });
 
   client.on('invalid-state', function (cmd) {
-    console.log('Invalid state. You tried calling ' + cmd);
+    log('Invalid state. You tried calling ' + cmd);
   });
 
   client.on('locked', function (cmd) {
-    console.log('Current command has not finished yet. You tried calling ' + cmd);
+    log('Current command has not finished yet. You tried calling ' + cmd);
   });
 
   client.on('login', function (status, rawdata) {
 
     if (status) {
 
-      console.log('LOGIN/PASS success');
+      log('LOGIN/PASS success');
       client.capa();
 
     } else {
 
-      console.log('LOGIN/PASS failed');
+      log('LOGIN/PASS failed');
       client.quit();
 
     }
@@ -102,13 +94,13 @@
 
     if (status) {
 
-      console.log('CAPA success');
-      if (debug) console.log('Parsed data: ' + util.inspect(data));
+      log('CAPA success');
+      if (debug) log('Parsed data: ' + util.inspect(data));
       client.noop();
 
     } else {
 
-      console.log('CAPA failed');
+      log('CAPA failed');
       client.quit();
 
     }
@@ -119,12 +111,12 @@
 
     if (status) {
 
-      console.log('NOOP success');
+      log('NOOP success');
       client.stat();
 
     } else {
 
-      console.log('NOOP failed');
+      log('NOOP failed');
       client.quit();
 
     }
@@ -136,13 +128,13 @@
 
     if (status === true) {
 
-      console.log('STAT success');
-      if (debug) console.log('Parsed data: ' + util.inspect(data));
+      log('STAT success');
+      if (debug) log('Parsed data: ' + util.inspect(data));
       client.list();
 
     } else {
 
-      console.log('STAT failed');
+      log('STAT failed');
       client.quit();
 
     }
@@ -152,19 +144,19 @@
 
     if (status === false) {
 
-      if (msgnumber !== undefined) console.log('LIST failed for msgnumber ' + msgnumber);
-      else console.log('LIST failed');
+      if (msgnumber !== undefined) log('LIST failed for msgnumber ' + msgnumber);
+      else log('LIST failed');
 
       client.quit();
 
     } else if (msgcount === 0) {
 
-      console.log('LIST success with 0 elements');
+      log('LIST success with 0 elements');
       client.quit();
 
     } else {
       GLOBAL.msgcount = msgcount;
-      console.log('LIST success with ' + msgcount + ' element(s)');
+      log('LIST success with ' + msgcount + ' element(s)');
       client.uidl();
 
     }
@@ -174,13 +166,13 @@
 
     if (status === true) {
 
-      console.log('UIDL success');
-      if (debug) console.log('Parsed data: ' + data);
+      log('UIDL success');
+      if (debug) log('Parsed data: ' + data);
       client.top(GLOBAL.msgcount, 10);
 
     } else {
 
-      console.log('UIDL failed for msgnumber ' + msgnumber);
+      log('UIDL failed for msgnumber ' + msgnumber);
       client.quit();
 
     }
@@ -191,13 +183,13 @@
 
     if (status === true) {
 
-      console.log('TOP success for msgnumber ' + msgnumber);
-      if (debug) console.log('Parsed data: ' + data);
+      log('TOP success for msgnumber ' + msgnumber);
+      if (debug) log('Parsed data: ' + data);
       client.retr(msgnumber);
 
     } else {
 
-      console.log('TOP failed for msgnumber ' + msgnumber);
+      log('TOP failed for msgnumber ' + msgnumber);
       client.quit();
 
     }
@@ -207,19 +199,19 @@
 
     if (status === true) {
 
-      console.log('RETR success for msgnumber ' + msgnumber + '\n---------------------');
+      log('RETR success for msgnumber ' + msgnumber + '\n---------------------');
 
 
       // metadata
       var subj = data.match(/Subject: (.+)/);
-      if (subj) subj = subj[1]; else return console.log('Omitiendo correo sin subject\n---------------------');
+      if (subj) subj = subj[1]; else return log('Omitiendo correo sin subject\n---------------------');
       var date = data.match(/\nDate: (.+)/);
-      if (date) date = new Date(date[1]); else return console.log('Omitiendo correo sin fecha\n---------------------');
-      console.log('Fecha:', date);
+      if (date) date = new Date(date[1]); else return log('Omitiendo correo sin fecha\n---------------------');
+      log('Fecha:', date);
 
       // contenido
       var txt = data.split('Content-Type: text/plain; charset=UTF-8')[1];
-      if (!txt) return console.log('Omitiendo email escrito en HTML\n--------------------\n');
+      if (!txt) return log('Omitiendo email escrito en HTML\n--------------------\n');
       txt = txt.split('Content-Type: text/html; charset=UTF-8')[0];
       txt = txt.split('\n');
       txt.splice(0, 1);
@@ -229,8 +221,8 @@
 
 
       if (subj === 'Contacto por formulario') {
-        console.log('Detectado formulario de contacto!');
-        console.log('\n---------------------');
+        log('Detectado formulario de contacto!');
+        log('\n---------------------');
         try {
           var persona = {
             nombre: txt.match(/Nombre: - (.*)/)[1],
@@ -240,47 +232,53 @@
             zonas: txt.match(/zonas quieres climatizar. - (.*)/)[1]
           };
 
-          console.log('* La persona se llama "%s" y su correo es "%s"', persona.nombre, persona.email);
+          log('* La persona se llama "%s" y su correo es "%s"', persona.nombre, persona.email);
 
           if (date.getHours() < HoraInicio) {
-            console.log('* Enviando aviso de que abrimos a las %s', HoraInicio);
+            log('* Enviando aviso de que abrimos a las %s', HoraInicio);
             enviarAviso(persona.email, 'inicio', persona);
           }
           if (date.getHours() > HoraCierre) {
-            console.log('* Enviando aviso de que cerramos a las %s', HoraCierre);
+            log('* Enviando aviso de que cerramos a las %s', HoraCierre);
             enviarAviso(persona.email, 'cierre', persona);
           }
-        } catch (e) { console.log('Error procesando formulario!\n---------------------\n', e); }
-      } else { console.log('Omitiendo correo "%s"\n---------------------\n', subj); }
+        } catch (e) { log('Error procesando formulario!\n---------------------\n', e); }
+      } else { log('Omitiendo correo "%s"\n---------------------\n', subj); }
 
-      // console.log('Parsed data: ' + data)
+      // log('Parsed data: ' + data)
 
       if (msgnumber !== undefined) { // client.dele(msgnumber)
         client.quit();
       }
     } else {
-      console.log('RETR failed for msgnumber ' + msgnumber);
+      log('RETR failed for msgnumber ' + msgnumber);
       client.quit();
     }
   });
 
   client.on('dele', function (status, msgnumber, data, rawdata) {
     if (status === true) {
-      console.log('DELE success for msgnumber ' + msgnumber);
+      log('DELE success for msgnumber ' + msgnumber);
       client.rset();
     } else {
-      console.log('DELE failed for msgnumber ' + msgnumber);
+      log('DELE failed for msgnumber ' + msgnumber);
       client.quit();
     }
   });
 
   client.on('rset', function (status, rawdata) {
-    if (status === true) console.log('RSET success');
-    else console.log('RSET failed');
+    if (status === true) log('RSET success');
+    else log('RSET failed');
     client.quit();
   });
 
   client.on('quit', function (status, rawdata) {
-    if (status === true) console.log('QUIT success');
-    else console.log('QUIT failed');
+    if (status === true) log('QUIT success');
+    else log('QUIT failed');
   });
+}
+
+module.exports = function (config) {
+  log('OK', config.HoraInicio)
+  mail();
+}

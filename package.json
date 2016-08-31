@@ -9,12 +9,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "google-auth-library": "^0.9.8",
     "googleapis": "^12.4.0",
     "imap": "^0.8.17",
     "mailcomposer": "^3.10.0",
     "mailgun-js": "^0.7.12",
+    "node-cron": "^1.1.1",
     "poplib": "^0.1.7",
     "sqlite3": "^3.1.4"
   }

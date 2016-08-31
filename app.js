@@ -9,5 +9,6 @@
 
 const config  = require('./config')
 const db      = require('./modulos/db')(config);
-const api     = require('./modulos/api')(config);
-const mail    = require('./modulos/mail')(config);
+const api     = require('./modulos/api')(config, db);
+const email    = require('./modulos/email')(config, db);
+const cron    = require('./modulos/cron')(config, email);

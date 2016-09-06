@@ -15,6 +15,13 @@ module.exports = function (config, db) {
 
   app.use(bodyParser.json());
 
+  //CORS
+  app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
+
   //BASE
   app.get('/', function (req, res) {
     res.send('API OK');
@@ -30,7 +37,7 @@ module.exports = function (config, db) {
 
 
 
-  app.listen(3000, function () {
+  app.listen(config.puertoAPI, function () {
     log(`OK en ${config.hostAPI}:${config.puertoAPI}`);
   });
 

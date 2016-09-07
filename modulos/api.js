@@ -30,7 +30,7 @@ module.exports = function (config, db) {
   //ACCIONES
   app.all('/:action', function (req,res) {
     let action = db[`${req.method}_${req.params.action}`];
-    if (!action) return res.status(400).send('Accion o metodo invalido.');
+    if (!action) { log(`Recibida solicitud invalida: ${req.params.action}`); return res.status(400).send('Accion o metodo invalido.'); }
     log(`Ejecutando ${req.method} ${req.params.action}`);
     action(res, req.body.params);
   })

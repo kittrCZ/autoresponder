@@ -10,12 +10,15 @@ var db = new sqlite3.Database('datos/db.sqlite');
 
 
 
-module.exports = function (config) {
-  db.run("CREATE TABLE IF NOT EXISTS config (param TEXT, value TEXT)", function (err) {
-    if(err) return log(`ERR ${err}`);
-    else log('OK');
-  });
-  return {
+// for (var i=0;i<99999*20000;i++) {}
+
+db.run("CREATE TABLE IF NOT EXISTS config (param TEXT, value TEXT)", function (err) {
+  if(err) return log(`${'ERROR'.red.bold} ${err}`);
+  else log('OK');
+});
+
+
+module.exports = {
 
     /**
      * Guarda los ajustes enviados en un JSON
@@ -43,8 +46,4 @@ module.exports = function (config) {
         res.json(params)
       })
     }
-
-
-
-  }
 }

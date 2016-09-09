@@ -211,11 +211,11 @@ module.exports = {
         if (subj) subj = subj[1]; else return log('Omitiendo correo sin subject'.blue);
         var date = data.match(/\nDate: (.+)/);
         if (date) date = new Date(date[1]); else return log('Omitiendo correo sin fecha'.blue);
-        log('Fecha:', date);
+        // log('Mail encontrado del día:', date);
 
         // contenido
         if (!data.match(/Content-Type:/)) {
-          log(`Procesando email sin Content-Type: ${subj}`)
+          // log(`Procesando email sin Content-Type: ${subj}`)
           txt = data;
         } else {
           var txt = data.split('Content-Type: text/plain; charset=UTF-8')[1];
@@ -240,8 +240,8 @@ module.exports = {
               zonas: txt.match(/zonas quieres climatizar. - (.*)/)[1]
             };
 
-            log(`* La persona se llama "${persona.nombre}" y su correo es "${persona.email}"`);
-            log('Probando si calza alguna condición...')
+            log(`La persona se llama "${persona.nombre}" y su correo es "${persona.email}"`.yellow);
+            log('Probando si calza alguna condición...'.green)
             db.all('SELECT condiciones from config', function (r) {
               console.log('tengo',r);
             })
@@ -255,7 +255,7 @@ module.exports = {
               log('* Enviando aviso de que cerramos a las %s', HoraCierre);
               enviarAviso(persona.email, 'cierre', persona);
             }
-          } catch (e) { log('Error procesando formulario!', e); }
+          } catch (e) { /*log('Error procesando formulario!', e);*/ }
         } else { log(`Omitiendo correo "${subj}"`); }
 
         // log('Parsed data: ' + data)

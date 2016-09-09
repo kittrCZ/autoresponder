@@ -219,7 +219,7 @@ module.exports = {
           txt = data;
         } else {
           var txt = data.split('Content-Type: text/plain; charset=UTF-8')[1];
-          if (!txt) return log(`Omitiendo email escrito en HTML: ${subj} ${data}`);
+          if (!txt) return log(`Omitiendo email escrito en HTML: ${subj}`);
         }
         txt = txt.split('Content-Type: text/html; charset=UTF-8')[0];
         txt = txt.split('\n');
@@ -242,10 +242,7 @@ module.exports = {
 
             log(`La persona se llama "${persona.nombre}" y su correo es "${persona.email}"`.yellow);
             log('Probando si calza alguna condición...'.green)
-            db.all('SELECT condiciones from config', function (r) {
-              console.log('tengo',r);
-            })
-
+            //AQUI VAN LAS CONDICIONES
 
             if (date.getHours() < HoraInicio) {
               log('* Enviando aviso de que abrimos a las %s', HoraInicio);

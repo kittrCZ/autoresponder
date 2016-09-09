@@ -19,8 +19,7 @@ const cron    = require('./modulos/cron');
 
 process.stdin.on('data', function(d) {
   let cmd=d.toString().trim();
-  // if (cmd == 'm')
-  email.check();
+  if (cmd != 'rs')  email.check();
 });
 
 
@@ -41,6 +40,7 @@ db.all('SELECT * from config where param="condiciones"', function (err, r) {
 
     if (condicion.tipo_condicion == 'rango_dias') {
       console.log(`* Desde el ${fecha(condicion.fechaDesde)} hasta el ${fecha(condicion.fechaHasta)}`);
+
     }
     if (condicion.tipo_condicion == 'dia_semana') {
       console.log(`* Todos los ${dia(condicion.dia_semana)}`);

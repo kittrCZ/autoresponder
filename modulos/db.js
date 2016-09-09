@@ -5,9 +5,10 @@
 
 'use strict';
 const log = require('../util/log')('DB');
-var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database('datos/db.sqlite');
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('datos/db.sqlite');
 
+log('OK');
 
 
 // for (var i=0;i<99999*20000;i++) {}

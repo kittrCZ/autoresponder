@@ -6,8 +6,10 @@
 * @author seb
 */
 
-const db      = require('./modulos/db');
 const config  = require('./config');
-const api     = require('./modulos/api')(config, db);
-const email   = require('./modulos/email')(config, db);
-const cron    = require('./modulos/cron')(config, email);
+const db      = require('./modulos/db');
+const api     = require('./modulos/api');
+const email   = require('./modulos/email');
+const cron    = require('./modulos/cron');
+
+email.check(); //chequeo inicial

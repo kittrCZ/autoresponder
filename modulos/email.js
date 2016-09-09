@@ -4,6 +4,7 @@
  * @author seb
  */
 
+const db = require('../util/db');
 const log = require('../util/log')('EMAIL');
 log(`OK`.blue);
 
@@ -241,7 +242,11 @@ module.exports = {
 
             log(`* La persona se llama "${persona.nombre}" y su correo es "${persona.email}"`);
             log('Probando si calza alguna condición...')
-            // db.all
+            db.all('SELECT condiciones from config', function (r) {
+              console.log('tengo',r);
+            })
+
+
             if (date.getHours() < HoraInicio) {
               log('* Enviando aviso de que abrimos a las %s', HoraInicio);
               enviarAviso(persona.email, 'inicio', persona);

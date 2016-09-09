@@ -10,6 +10,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const config = require('../config');
+const db = require('../util/db');
 
 app.use(bodyParser.json());
 

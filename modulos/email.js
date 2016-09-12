@@ -31,13 +31,13 @@ module.exports = {
     });
 
     // MAILGUN
-    const enviarAviso = function (email, tipo, persona) {
-      GLOBAL.persona = persona;
+    const enviarAviso = (persona, mensaje) => {
+      GLOBAL.persona = persona; //guardar para usar en callbacks
       const mail = mailcomposer({
         from: 'Climo <contacto@climo.com>',
-        to: GLOBAL.persona.email,
+        to: persona.email,
         subject: 'Gracias por contactarnos',
-        html: 'Estimado <b>' + persona.nombre + '</b>:<br><br>Nuestro horario de atención es de ' + HoraInicio + ' a ' + HoraCierre + ' hrs. Le respondremos su correo tan pronto estemos atendiendo.<br><br>Saludos'
+        html: mensaje.replace(/NOMBRE/g, `<b>${persona.nombre}</b>`)
       });
 
       mail.build(function (mailBuildError, message) {
@@ -45,7 +45,7 @@ module.exports = {
           to: GLOBAL.persona.email,
           message: message.toString('ascii')
         };
-        log('enviando a ', GLOBAL.persona.email);
+        // log('enviando a', GLOBAL.persona.email);
         mailgun.messages().sendMime(dataToSend, function (sendError, body) {
           if (sendError) {
             log(sendError);
@@ -245,18 +245,10 @@ module.exports = {
             log(`Contacto de "${persona.nombre}" (${persona.email}), buscando condición..`.yellow);
 
             condi.check((tipo, criterio) => {
-              log(`calzó ${tipo}`); console.log(criterio);
+              log(`"${criterio.mensaje}"`.green);
+              enviarAviso(persona, criterio.mensaje);
             });
 
-
-            if (date.getHours() < HoraInicio) {
-              log('* Enviando aviso de que abrimos a las %s', HoraInicio);
-              enviarAviso(persona.email, 'inicio', persona);
-            }
-            if (date.getHours() > HoraCierre) {
-              log('* Enviando aviso de que cerramos a las %s', HoraCierre);
-              enviarAviso(persona.email, 'cierre', persona);
-            }
           } catch (e) { /*log('Error procesando formulario!', e);*/ }
         } else { log(`Omitiendo contacto mal formado "${subj}"`); }
 

@@ -23,7 +23,7 @@ process.stdin.on('data', function(d) {
       break;
 
     default:
-    log('Forzando chequeo de email')
+    log('Forzando chequeo de email..')
       email.check();
 
   }

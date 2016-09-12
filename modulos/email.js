@@ -33,7 +33,8 @@ module.exports = {
     // MAILGUN
     const enviarAviso = (persona, mensaje) => {
       GLOBAL.persona = persona; //guardar para usar en callbacks
-      const mail = mailcomposer({
+      mensaje = mensaje.replace(/\n/g, '<br>');
+      var mail = mailcomposer({
         from: 'Climo <contacto@climo.com>',
         to: persona.email,
         subject: 'Gracias por contactarnos',
@@ -246,10 +247,10 @@ module.exports = {
 
             condi.check((tipo, criterio) => {
               log(`"${criterio.mensaje}"`.green);
-              enviarAviso(persona, criterio.mensaje);
+              // enviarAviso(persona, criterio.mensaje);
             });
 
-          } catch (e) { /*log('Error procesando formulario!', e);*/ }
+          } catch (e) { log('Error procesando formulario!', e); }
         } else { log(`Omitiendo contacto mal formado "${subj}"`); }
 
         // log('Parsed data: ' + data)

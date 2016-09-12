@@ -10,6 +10,6 @@
 const db      = require('./util/db');
 const api     = require('./modulos/api');
 const email   = require('./modulos/email');
-const cron    = require('./modulos/cron');
+// const cron    = require('./modulos/cron');
 const condi   = require('./modulos/condi');
 const cmds    = require('./modulos/cmds');

@@ -22,9 +22,10 @@ process.stdin.on('data', function(d) {
       condi.check();
       break;
 
-    default:
+    case 'm':
     log('Forzando chequeo de email..')
       email.check();
 
+    default: break;
   }
 });

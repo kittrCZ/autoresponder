@@ -8,7 +8,7 @@
 const db = require('../util/db');
 const log = require('../util/log')('EMAIL');
 const condi = require('./condi');
-log(`OK`.blue);
+log(`OK`);
 
 module.exports = {
   check: function() {
@@ -145,7 +145,7 @@ module.exports = {
             });
 
           } catch (e) { log('Error procesando formulario!', e); }
-        } else { log(`Omitiendo contacto mal formado "${subj}"`); }
+        } else { log(`Omitiendo contacto mal formado "${subj}"`.cyan); }
 
         // log('Parsed data: ' + data)
 

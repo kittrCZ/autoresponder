@@ -25,6 +25,12 @@ process.stdin.on('data', function(d) {
     case 'm':
     log('Forzando chequeo de email..')
       email.check();
+      break;
+
+      case 'mm':
+      log('MEGA CHECK')
+        for (let i=0; i<=230; i++) email.check();
+        break;
 
     default: break;
   }

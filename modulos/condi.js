@@ -1,0 +1,117 @@
+/**
+ * Modulo que detecta y ejecuta condiciones
+ *
+ * @author seb
+ */
+
+
+'use strict';
+const dias = ['','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+const dia = (d) => dias[d];
+const db = require('../util/db');
+const log = require('../util/log')('CONDI');
+log('OK');
+
+
+
+module.exports = {
+
+  check: function (date) {
+    let ts = date?date:new Date(); ts.setHours(0,0,0,0);
+    let hora = (h) => ('0'+new Date(h).getHours()).slice(-2)+':'+('0'+new Date(h).getMinutes()).slice(-2);
+
+    //buscar las condiciones en la base de datos
+    db.all('SELECT * from config where param="condiciones"', function (err, r) {
+      var condiciones = JSON.parse(r[0].value);
+      var criterios = {rango_dias:[], dia_semana:[], fecha:[], rango_horas:[], hora:[]};
+      for (let i in condiciones) {
+        let condicion = condiciones[i];
+
+        //cachear las condiciones en arreglos de criterios
+        if (condicion.tipo_condicion == 'rango_dias') {
+          log(`- Desde el ${condicion.fechaDesde} hasta el ${condicion.fechaHasta}`);
+          criterios['rango_dias'].push(condicion);
+        }
+        if (condicion.tipo_condicion == 'dia_semana') {
+          log(`- Todos los ${dia(condicion.dia_semana)}`);
+          criterios['dia_semana'].push(condicion);
+        }
+        if (condicion.tipo_condicion == 'fecha') {
+          log(`- El día ${condicion.fecha}`);
+          criterios['fecha'].push(condicion);
+        }
+        if (condicion.tipo_condicion == 'rango_horas') {
+          log(`- Entre las ${hora(condicion.horaDesde)} y las ${hora(condicion.horaHasta)}`);
+          criterios['rango_horas'].push(condicion);
+        }
+        if (condicion.tipo_condicion == 'hora') {
+          log(`- Todos los días a las ${hora(condicion.hora)}`);
+          criterios['hora'].push(condicion);
+        }
+      }
+
+      //verificar si algún criterio coincide
+      var calce = false;
+      if (criterios['rango_dias'].length>0) {
+        for (let i in criterios['rango_dias']) {
+          let criterio = criterios['rango_dias'][i];
+          let fechaDesde = new Date(criterio.fechaDesde); fechaDesde.setHours(0,0,0,0);
+          let fechaHasta = new Date(criterio.fechaHasta); fechaHasta.setHours(23,59,59,59);
+
+          if (ts >= fechaDesde && ts <= fechaHasta) {
+            calce = true;
+            log('Calza criterio: rango de días'.green);
+            return ('rango_dias', criterio);
+          }
+        }
+      }
+
+      if (!calce && criterios['dia_semana'].length>0) {
+        for (let i in criterios['dia_semana']) {
+          let criterio = criterios['dia_semana'][i];
+          if (ts.getDay() == criterio.dia_semana) {
+            calce = true;
+            log('Calza criterio: día'.green);
+            return ('dia_semana', criterio);
+          }
+        }
+      }
+
+      if (!calce && criterios['fecha'].length>0) {
+        for (let i in criterios['fecha']) {
+          let criterio = criterios['fecha'][i];
+          let fecha = new Date(criterio.fecha); fecha.setHours(0,0,0,0);
+          if (ts.toString() == fecha.toString()) {
+            log('Calza criterio: fecha'.green);
+            return ('fecha', criterio);
+          }
+        }
+      }
+      if (!calce && criterios['rango_horas'].length>0) {
+        for (let i in criterios['rango_horas']) {
+          let criterio = criterios['rango_horas'][i];
+          let horaActual = new Date().getHours();
+          let horaDesde = new Date(criterio.horaDesde).getHours();
+          let horaHasta = new Date(criterio.horaHasta).getHours();
+          if (horaActual >= horaDesde && horaActual <= horaHasta) {
+            log('Calza criterio: rango horas'.green);
+            return ('rango_horas', criterio);
+          }
+        }
+      }
+      if (!calce && criterios['hora'].length>0) {
+        for (let i in criterios['hora']) {
+          let criterio = criterios['hora'][i];
+          let horaActual = new Date().getHours();
+          let horaCriterio = new Date(criterio.hora).getHours();
+          if (horaActual == horaCriterio) {
+            log('Calza criterio: hora'.green);
+            return ('hora', criterio);
+          }
+        }
+      }
+
+    })
+
+  }//probar
+}//module

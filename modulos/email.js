@@ -4,8 +4,10 @@
  * @author seb
  */
 
+'use strict';
 const db = require('../util/db');
 const log = require('../util/log')('EMAIL');
+const condi = require('./condi');
 log(`OK`.blue);
 
 module.exports = {
@@ -240,9 +242,9 @@ module.exports = {
               zonas: txt.match(/zonas quieres climatizar. - (.*)/)[1]
             };
 
-            log(`La persona se llama "${persona.nombre}" y su correo es "${persona.email}"`.yellow);
-            log('Probando si calza alguna condición...'.green)
+            log(`Detectado contacto de "${persona.nombre}" (${persona.email}), buscando condición..`.yellow);
             //AQUI VAN LAS CONDICIONES
+            let Condi = condi.check();
 
             if (date.getHours() < HoraInicio) {
               log('* Enviando aviso de que abrimos a las %s', HoraInicio);

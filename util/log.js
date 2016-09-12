@@ -10,7 +10,7 @@
 'use strict';
 const config = require('../config.js')
 const colors = require('colors');
-const cl = ['red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white', 'gray', 'grey'];
+const cl = ['red', 'green', 'yellow', 'magenta', 'cyan', 'white', 'gray', 'grey'];
 
 
 module.exports = function(modulo) {

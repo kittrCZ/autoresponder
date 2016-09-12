@@ -16,12 +16,15 @@ log('OK');
 
 module.exports = {
 
-  check: function (date) {
-    let ts = date?date:new Date(); ts.setHours(0,0,0,0);
+  check: function (cb) {
+    if(!cb) cb = ()=>0;
+    let ts = new Date(); ts.setHours(0,0,0,0);
     let hora = (h) => ('0'+new Date(h).getHours()).slice(-2)+':'+('0'+new Date(h).getMinutes()).slice(-2);
 
     //buscar las condiciones en la base de datos
     db.all('SELECT * from config where param="condiciones"', function (err, r) {
+      if (err) return log(`Error: ${err}`);
+
       var condiciones = JSON.parse(r[0].value);
       var criterios = {rango_dias:[], dia_semana:[], fecha:[], rango_horas:[], hora:[]};
       for (let i in condiciones) {
@@ -61,7 +64,7 @@ module.exports = {
           if (ts >= fechaDesde && ts <= fechaHasta) {
             calce = true;
             log('Calza criterio: rango de días'.green);
-            return ('rango_dias', criterio);
+            cb('rango_dias', criterio);
           }
         }
       }
@@ -72,7 +75,7 @@ module.exports = {
           if (ts.getDay() == criterio.dia_semana) {
             calce = true;
             log('Calza criterio: día'.green);
-            return ('dia_semana', criterio);
+            cb('dia_semana', criterio);
           }
         }
       }
@@ -83,7 +86,7 @@ module.exports = {
           let fecha = new Date(criterio.fecha); fecha.setHours(0,0,0,0);
           if (ts.toString() == fecha.toString()) {
             log('Calza criterio: fecha'.green);
-            return ('fecha', criterio);
+            cb('fecha', criterio);
           }
         }
       }
@@ -95,7 +98,7 @@ module.exports = {
           let horaHasta = new Date(criterio.horaHasta).getHours();
           if (horaActual >= horaDesde && horaActual <= horaHasta) {
             log('Calza criterio: rango horas'.green);
-            return ('rango_horas', criterio);
+            cb('rango_horas', criterio);
           }
         }
       }
@@ -106,7 +109,7 @@ module.exports = {
           let horaCriterio = new Date(criterio.hora).getHours();
           if (horaActual == horaCriterio) {
             log('Calza criterio: hora'.green);
-            return ('hora', criterio);
+            cb('hora', criterio);
           }
         }
       }

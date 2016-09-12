@@ -4,7 +4,7 @@
  */
 
 'use strict';
-const log = require('../util/log')('DB');
+const log = require('../util/log')('DB   ');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('datos/db.sqlite');
 

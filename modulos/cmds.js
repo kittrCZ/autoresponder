@@ -7,7 +7,7 @@
 'use strict';
 const email = require('./email');
 const condi = require('./condi');
-const log = require('../util/log')('CMD');
+const log = require('../util/log')('CMD  ');
 log('OK');
 
 process.stdin.on('data', function(d) {
@@ -18,7 +18,7 @@ process.stdin.on('data', function(d) {
       break;
 
     case 'c':
-      log('Revisando condiciones');
+      log('Listando condiciones..');
       condi.check();
       break;
 

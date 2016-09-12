@@ -232,7 +232,6 @@ module.exports = {
 
 
         if (subj === 'Contacto por formulario') {
-          log('Detectado formulario de contacto!'.yellow);
           try {
             var persona = {
               nombre: txt.match(/Nombre: - (.*)/)[1],
@@ -242,9 +241,13 @@ module.exports = {
               zonas: txt.match(/zonas quieres climatizar. - (.*)/)[1]
             };
 
-            log(`Detectado contacto de "${persona.nombre}" (${persona.email}), buscando condición..`.yellow);
-            //AQUI VAN LAS CONDICIONES
-            let Condi = condi.check();
+            //detectado nuevo contacto
+            log(`Contacto de "${persona.nombre}" (${persona.email}), buscando condición..`.yellow);
+
+            condi.check((tipo, criterio) => {
+              log(`calzó ${tipo}`); console.log(criterio);
+            });
+
 
             if (date.getHours() < HoraInicio) {
               log('* Enviando aviso de que abrimos a las %s', HoraInicio);
@@ -255,7 +258,7 @@ module.exports = {
               enviarAviso(persona.email, 'cierre', persona);
             }
           } catch (e) { /*log('Error procesando formulario!', e);*/ }
-        } else { log(`Omitiendo correo "${subj}"`); }
+        } else { log(`Omitiendo contacto mal formado "${subj}"`); }
 
         // log('Parsed data: ' + data)
 

@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const log = require('../util/log')('API');
+const log = require('../util/log')('API  ');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');

@@ -25,10 +25,9 @@ const password = process.env.AutoresponderPASS;
 
 
 if (!username) {
-  log('ERROR'.red+' Debes definir usuario y clave en variables de entorno!'.yellow);
+  log('ERROR'.red+' Debes definir usuario/clave en variables de entorno! (~/.profile)'.yellow);
   log('  export AutoresponderUSER="usuario@gmail.com"');
   log('  export AutoresponderPASS="password"');
-  log('Sugerencia: ponerlo en ~/.profile'.yellow);
   process.exit();
 }
 

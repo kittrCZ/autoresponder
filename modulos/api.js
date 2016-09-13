@@ -1,10 +1,14 @@
 /**
- * La API
+ * Módulo de API REST
+ * 
+ * Recibe instrucciones vía HTTP/REST permitiendo cambiar las condiciones del enviador de emails.
+ * A futuro podría incluir más funcionalidades.
  *
  * @author seb
  */
-'use strict';
 
+
+'use strict';
 const log = require('../util/log')('API  ');
 const express = require('express');
 const app = express();
@@ -41,6 +45,7 @@ app.post('/config', function (req,res) {
   var params=req.body;
 
   //guardar parametros en la config (pisar si ya existen)
+  //esto permite crear parametros nuevos o enviar parametros especificos sin tocar otros
   db.serialize(function () {
     for (let param in params) {
       log(`Seteando "${param}" a "${params[param]}"`);

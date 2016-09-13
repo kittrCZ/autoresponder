@@ -1,6 +1,11 @@
 /**
  * Modulo que detecta y ejecuta condiciones
  *
+ * Ejemplo de Uso:
+ *  let condi = require('./condi');
+ *  condi.check((condi, data)=>{ console.log(`la condición que calza es '${condi}':`, data)})
+ *
+ *
  * @author seb
  */
 
@@ -15,6 +20,7 @@ log('OK');
 
 
 module.exports = {
+
 
   check: function (cb) {
     if(!cb) cb = ()=>0;

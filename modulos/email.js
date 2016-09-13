@@ -1,5 +1,9 @@
 /**
  * Modulo de email
+ * 
+ * Se conecta a un servidor POP3 y procesa el último email almacenado allí, y luego
+ * determina si alguna condición vigente calza con la hora actual, enviando un correo
+ * de acuerdo al criterio conincidente.
  *
  * @author seb
  */

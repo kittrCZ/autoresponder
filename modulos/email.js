@@ -27,7 +27,7 @@ var totalMails= 1;
 
 
 if (!username) {
-  log('ERROR'.red+' Debes definir usuario/clave en variables de entorno! (~/.profile)'.yellow);
+  log('ERROR'.white.bgRed+' Debes definir usuario/clave en variables de entorno! (~/.profile)'.yellow);
   log('  export AutoresponderUSER="usuario@gmail.com"');
   log('  export AutoresponderPASS="password"');
   process.exit();

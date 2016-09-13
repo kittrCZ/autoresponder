@@ -22,6 +22,8 @@ const debug = false;
 const enabletls = true;
 const username = process.env.AutoresponderUSER;
 const password = process.env.AutoresponderPASS;
+var currentMail = 1;
+var totalMails= 1;
 
 
 if (!username) {
@@ -97,10 +99,11 @@ module.exports = {
     		log("LIST failed");
     		client.quit();
     	} else if (msgcount > 0) {
-    		let totalmsgcount = msgcount;
+        totalMails = msgcount;
+    		currentMail = msgcount;
     		let currentmsg = 1;
     		log("LIST success with " + msgcount + " message(s)");
-    		client.retr(1);
+        client.retr(currentMail);
     	} else {
     		log("LIST success with 0 message(s)");
     		client.quit();
@@ -164,11 +167,19 @@ module.exports = {
         log('RETR failed for msgnumber ' + msgnumber);
         client.quit();
       }
+      if (currentMail>200) {
+        currentMail--;
+        log('NEXT', currentMail);
+        client.dele(msgnumber); //test por ahora
+        // client.retr(currentMail);
+      } else {
+        log('FIN')
+      }
     });
 
     client.on('dele', function (status, msgnumber, data, rawdata) {
       if (status === true) {
-        log('DELE success for msgnumber ' + msgnumber);
+        log('dele ok', msgnumber);
         client.rset();
       } else {
         log('DELE failed for msgnumber ' + msgnumber);
@@ -177,7 +188,9 @@ module.exports = {
     });
 
     client.on('rset', function (status, rawdata) {
-      client.quit();
+      // client.quit();
+      log('fin')
+      // client.retr(currentMail);
     });
 
     client.on('quit', function (status, rawdata) {

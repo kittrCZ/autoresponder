@@ -15,4 +15,4 @@ const api     = require('./modulos/api');
 const email   = require('./modulos/email');
 const condi   = require('./modulos/condi');
 const cmds    = require('./modulos/cmds');
-// const cron    = require('./modulos/cron');
+const cron    = require('./modulos/cron');

@@ -1,6 +1,6 @@
 /**
  * Módulo de API REST
- * 
+ *
  * Recibe instrucciones vía HTTP/REST permitiendo cambiar las condiciones del enviador de emails.
  * A futuro podría incluir más funcionalidades.
  *
@@ -60,5 +60,5 @@ app.post('/config', function (req,res) {
 
 
 app.listen(config.puertoAPI, function () {
-  log(`OK en ${config.hostAPI}:${config.puertoAPI}`);
+  log(`OK (${config.hostAPI}:${config.puertoAPI})`);
 });

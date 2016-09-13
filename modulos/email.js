@@ -1,6 +1,6 @@
 /**
  * Modulo de email
- * 
+ *
  * Se conecta a un servidor POP3 y procesa el último email almacenado allí, y luego
  * determina si alguna condición vigente calza con la hora actual, enviando un correo
  * de acuerdo al criterio conincidente.
@@ -12,27 +12,32 @@
 const db = require('../util/db');
 const log = require('../util/log')('EMAIL');
 const condi = require('./condi');
-log(`OK`);
+const util = require('util');
+const POP3Client = require('poplib');
+const mailgun = require('mailgun-js')({apiKey: 'key-4f62ca6ebe491376f6411bf49cbff872', domain: 'climino.com'});
+const mailcomposer = require('mailcomposer');
+const host = 'pop.gmail.com';
+const port = 995;
+const debug = false;
+const enabletls = true;
+const username = process.env.AutoresponderUSER;
+const password = process.env.AutoresponderPASS;
 
+
+if (!username) {
+  log('ERROR'.red+' Debes definir usuario y clave en variables de entorno!'.yellow);
+  log('  export AutoresponderUSER="usuario@gmail.com"');
+  log('  export AutoresponderPASS="password"');
+  log('Sugerencia: ponerlo en ~/.profile'.yellow);
+  process.exit();
+}
+
+
+log(`OK (${username}/${password})`);
 module.exports = {
   check: function() {
-    log('...');
-    const util = require('util');
-    const POP3Client = require('poplib');
-    const mailgun = require('mailgun-js')({apiKey: 'key-4f62ca6ebe491376f6411bf49cbff872', domain: 'climino.com'});
-    const mailcomposer = require('mailcomposer');
-
-    const host = 'pop.gmail.com';
-    const port = 995;
-    const debug = false;
-    const enabletls = true;
-    const username = 'sebastian.delvalle@engiefactory.com';
-    const password = 'TestTest';
-
-    const client = new POP3Client(port, host, {
-      debug: debug,
-      enabletls: enabletls
-    });
+    log('Conectando..');
+    const client = new POP3Client(port, host, {debug: debug, enabletls: enabletls});
 
     // MAILGUN
     const enviarAviso = (persona, mensaje) => {
@@ -111,15 +116,15 @@ module.exports = {
         var subj = data.match(/Subject: (.+)/);
         if (subj) subj = subj[1]; else { omitir=true; log('Omitiendo correo sin subject'.cyan); }
         var date = data.match(/\nDate: (.+)/);
-        if (date) date = new Date(date[1]); { omitir=true; log('Omitiendo correo sin fecha'.cyan); }
+        if (date && !omitir) date = new Date(date[1]); { omitir=true; log(`Omitiendo correo sin fecha: "${subj}"`.cyan); }
 
         // contenido
-        if (!data.match(/Content-Type:/)) {
-          log(`Procesando email sin Content-Type: ${subj}`.cyan)
+        if (!omitir && !data.match(/Content-Type:/)) {
+          log(`Procesando correo sin Content-Type: ${subj}`.cyan)
           txt = data;
         } else {
           var txt = data.split('Content-Type: text/plain; charset=UTF-8')[1];
-          if (!txt) { omitir=true; log(`Omitiendo email escrito en HTML: ${subj}`.cyan); }
+          if (!txt) { omitir=true; log(`Omitiendo correo escrito en HTML: ${subj}`.cyan); }
         }
         if (!omitir) {
           txt = txt.split('Content-Type: text/html; charset=UTF-8')[0];
@@ -130,7 +135,7 @@ module.exports = {
         }
 
 
-        if (subj === 'Contacto por formulario' && !omitir) {
+        if (!omitir) if (subj === 'Contacto por formulario' && !omitir) {
           try {
             var persona = {
               nombre: txt.match(/Nombre: - (.*)/)[1],
@@ -149,7 +154,7 @@ module.exports = {
             });
 
           } catch (e) { log('Error procesando formulario!', e); }
-        } else { log(`Omitiendo contacto mal formado "${subj}"`.cyan); }
+        } else { log(`Omitiendo mail que no es contacto: "${subj}"`.cyan); }
 
         // log('Parsed data: ' + data)
 

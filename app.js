@@ -11,7 +11,6 @@
 
 
 'use strict';
-const db      = require('./util/db');
 const api     = require('./modulos/api');
 const email   = require('./modulos/email');
 const condi   = require('./modulos/condi');

@@ -8,5 +8,13 @@ El sistema está dividido en módulos que se pueden activar o desactivar a gusto
 
 
 ## Instrucciones:
-* npm install
-* node .
+Se debe almacenar el usuario y contraseña de gmail como variales de entorno, de esta manera:
+```bash
+export AutoresponderUSER="usuario@gmail.com"
+export AutoresponderPASS="password"
+```
+Luego, instalar dependencias e iniciar el programa:
+```bash
+npm install
+node .
+```

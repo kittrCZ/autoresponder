@@ -33,7 +33,7 @@ if (!username) {
 }
 
 
-log(`OK (${username}/${password})`);
+log(`OK (${username})`);
 module.exports = {
   check: function() {
     log('Conectando..');

@@ -15,13 +15,15 @@ const dias = ['','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Dom
 const dia = (d) => dias[d];
 const db = require('../util/db');
 const log = require('../util/log')('CONDI');
-log('OK');
 
 
+//INIT
+db.all('SELECT * from config where param="condiciones"', function (err, r) {
+  var condiciones = JSON.parse(r[0].value);
+  log(`OK (${condiciones.length} condiciones)`)
+});
 
 module.exports = {
-
-
   check: function (cb) {
     if(!cb) cb = ()=>0;
     let ts = new Date(); ts.setHours(0,0,0,0);

@@ -12,7 +12,7 @@
  const config = require('../config');
  const email = require('./email');
 
- log(`OK`);
+ log(`OK (${config.cadenciaCron} minutos)`);
 
  cron.schedule('*/'+config.cadenciaCron+' * * * *', function () {
    log('Revisando email..');

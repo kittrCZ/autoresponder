@@ -10,7 +10,7 @@ const db = new sqlite3.Database('db.sqlite');
 
 db.run("CREATE TABLE IF NOT EXISTS config (param TEXT, value TEXT)", function (err) {
   if(err) return log(`${'ERROR'.red.bold} ${err}`);
-  else log('OK');
+  else log(`OK (${require('fs').statSync("db.sqlite").size}kb)`);
 });
 
 

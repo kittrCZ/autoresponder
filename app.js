@@ -11,6 +11,7 @@
 
 
 'use strict';
+const logo    = require('./util/splash');
 const api     = require('./modulos/api');
 const email   = require('./modulos/email');
 const condi   = require('./modulos/condi');

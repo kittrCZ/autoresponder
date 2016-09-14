@@ -33,7 +33,7 @@ app.get('/', function (req, res) {
 //ACCIONES
 app.get('/config', function (req,res) {
   db.all(`select * from config`, function (err, params) {
-    log('Respondiendo config');
+    log(' GET '.inverse+' Respondiendo solicitud de config');
     var conf={};
     for (let i in params) conf[params[i].param] = params[i].value;
     res.json(conf);
@@ -48,7 +48,7 @@ app.post('/config', function (req,res) {
   //esto permite crear parametros nuevos o enviar parametros especificos sin tocar otros
   db.serialize(function () {
     for (let param in params) {
-      log(`Seteando "${param}" a "${params[param]}"`);
+      log(' POST '.inverse+` Seteando "${param}" a "${params[param]}"`);
       db.run(`delete from config where param='${param}'`);
       db.run(`INSERT INTO config values ('${param}', '${params[param]}')`);
     }

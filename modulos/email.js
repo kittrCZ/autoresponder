@@ -100,7 +100,7 @@ module.exports = {
       if (nextMail==lastMail) {
         db.run(`UPDATE config set value='${lastMail}' where param='UltimoMail'`, (err)=>{
           if (err) log('ERROR'.red, 'Terminé pero no pude guardar cursor en DB:', err);
-          else log('Terminé.')
+          else log('Fin correos.')
         });
       }
       else {
@@ -123,11 +123,10 @@ module.exports = {
           //comprobar si se eliminaron mails y sino comenzar comprobación
           if (nextMail>lastMail) {
             let dif = nextMail;
-            log(`Detecté que se borraron ${nextMail-lastMail}, esto podría causar confusión.`);
+            log(`Detecté correos eliminados (${nextMail-lastMail}), esto podría causar confusión.`);
             nextMail=lastMail;
             db.run(`UPDATE config set value='${lastMail}' where param='UltimoMail'`, (err)=>{
               if (err) log('ERROR'.red, 'no pude guardar cursor en DB:', err);
-              else log(`Actualicé cursor en DB: ${dif}->${lastMail}`.green)
             });
           }
           else {

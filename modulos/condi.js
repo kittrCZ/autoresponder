@@ -44,7 +44,7 @@ module.exports = {
           criterios['rango_dias'].push(condicion);
         }
         if (condicion.tipo_condicion == 'dia_semana') {
-          if(debug) og(`- Todos los ${dia(condicion.dia_semana)}`);
+          if(debug) log(`- Todos los ${dia(condicion.dia_semana)}`);
           criterios['dia_semana'].push(condicion);
         }
         if (condicion.tipo_condicion == 'fecha') {

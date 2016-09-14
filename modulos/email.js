@@ -44,7 +44,6 @@ module.exports = {
 
     // MAILGUN
     const enviarAviso = (persona, mensaje) => {
-      console.log(`enviando '${mensaje}' a '${persona.email}'`);
       GLOBAL.persona = persona; //guardar para usar en callbacks
       mensaje = mensaje.replace(/\n/g, '<br>');
       var mail = mailcomposer({

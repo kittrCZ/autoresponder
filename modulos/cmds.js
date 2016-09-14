@@ -20,7 +20,7 @@ const comandos = {
   'rs': ()=> 0,
   'c':  ()=> {
     log('Listando condiciones..');
-    condi.check();
+    condi.check(null, true);
   },
   'm':  ()=> {
     log('Forzando chequeo de email..')
@@ -40,5 +40,5 @@ process.stdin.on('data', function(d) {
   if (cmd) try{comandos[cmd]()} catch(e){ log(`Comando desconocido: ${cmd.yellow}`); }
 });
 
-
-log(`OK (${Object.keys(comandos).length} comandos)`);
+let cmds=''; for (let i in comandos) cmds+=', '+i; //indexar comandos
+log(`OK (${Object.keys(comandos).length} comandos: ${cmds.substr(2)})`);

@@ -24,7 +24,7 @@ db.all('SELECT * from config where param="condiciones"', function (err, r) {
 });
 
 module.exports = {
-  check: function (cb) {
+  check: function (cb, debug) {
     if(!cb) cb = ()=>0;
     let ts = new Date(); ts.setHours(0,0,0,0);
     let hora = (h) => ('0'+new Date(h).getHours()).slice(-2)+':'+('0'+new Date(h).getMinutes()).slice(-2);
@@ -40,23 +40,23 @@ module.exports = {
 
         //cachear las condiciones en arreglos de criterios
         if (condicion.tipo_condicion == 'rango_dias') {
-          log(`- Desde el ${condicion.fechaDesde} hasta el ${condicion.fechaHasta}`);
+          if(debug) log(`- Desde el ${condicion.fechaDesde} hasta el ${condicion.fechaHasta}`);
           criterios['rango_dias'].push(condicion);
         }
         if (condicion.tipo_condicion == 'dia_semana') {
-          log(`- Todos los ${dia(condicion.dia_semana)}`);
+          if(debug) og(`- Todos los ${dia(condicion.dia_semana)}`);
           criterios['dia_semana'].push(condicion);
         }
         if (condicion.tipo_condicion == 'fecha') {
-          log(`- El día ${condicion.fecha}`);
+          if(debug) log(`- El día ${condicion.fecha}`);
           criterios['fecha'].push(condicion);
         }
         if (condicion.tipo_condicion == 'rango_horas') {
-          log(`- Entre las ${hora(condicion.horaDesde)} y las ${hora(condicion.horaHasta)}`);
+          if(debug) log(`- Entre las ${hora(condicion.horaDesde)} y las ${hora(condicion.horaHasta)}`);
           criterios['rango_horas'].push(condicion);
         }
         if (condicion.tipo_condicion == 'hora') {
-          log(`- Todos los días a las ${hora(condicion.hora)}`);
+          if(debug) log(`- Todos los días a las ${hora(condicion.hora)}`);
           criterios['hora'].push(condicion);
         }
       }
@@ -71,7 +71,7 @@ module.exports = {
 
           if (ts >= fechaDesde && ts <= fechaHasta) {
             calce = true;
-            log('Calza criterio: rango de días'.green);
+            if(debug) log('Calza criterio: rango de días'.green);
             cb('rango_dias', criterio);
           }
         }
@@ -82,7 +82,7 @@ module.exports = {
           let criterio = criterios['dia_semana'][i];
           if (ts.getDay() == criterio.dia_semana) {
             calce = true;
-            log('Calza criterio: día'.green);
+            if(debug) log('Calza criterio: día'.green);
             cb('dia_semana', criterio);
           }
         }
@@ -93,7 +93,7 @@ module.exports = {
           let criterio = criterios['fecha'][i];
           let fecha = new Date(criterio.fecha); fecha.setHours(0,0,0,0);
           if (ts.toString() == fecha.toString()) {
-            log('Calza criterio: fecha'.green);
+            if(debug) log('Calza criterio: fecha'.green);
             cb('fecha', criterio);
           }
         }
@@ -105,7 +105,7 @@ module.exports = {
           let horaDesde = new Date(criterio.horaDesde).getHours();
           let horaHasta = new Date(criterio.horaHasta).getHours();
           if (horaActual >= horaDesde && horaActual <= horaHasta) {
-            log('Calza criterio: rango horas'.green);
+            if(debug) log('Calza criterio: rango horas'.green);
             cb('rango_horas', criterio);
           }
         }
@@ -116,7 +116,7 @@ module.exports = {
           let horaActual = new Date().getHours();
           let horaCriterio = new Date(criterio.hora).getHours();
           if (horaActual == horaCriterio) {
-            log('Calza criterio: hora'.green);
+            if(debug) log('Calza criterio: hora'.green);
             cb('hora', criterio);
           }
         }

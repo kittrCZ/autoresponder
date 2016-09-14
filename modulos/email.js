@@ -1,3 +1,4 @@
+
 /**
  * Modulo de email
  *
@@ -22,8 +23,8 @@ const debug = false;
 const enabletls = true;
 const username = process.env.AutoresponderUSER;
 const password = process.env.AutoresponderPASS;
-var currentMail = 1;
 var nextMail = 0;
+var lastMail = 0;
 
 
 if (!username) {
@@ -43,6 +44,7 @@ module.exports = {
 
     // MAILGUN
     const enviarAviso = (persona, mensaje) => {
+      console.log(`enviando '${mensaje}' a '${persona.email}'`);
       GLOBAL.persona = persona; //guardar para usar en callbacks
       mensaje = mensaje.replace(/\n/g, '<br>');
       var mail = mailcomposer({
@@ -96,8 +98,17 @@ module.exports = {
     });
 
     let continuar = ()=>{
-      log('Continuando con ', nextMail);
-      client.retr(nextMail);
+      if (nextMail==lastMail) {
+        db.run(`UPDATE config set value='${lastMail}' where param='UltimoMail'`, (err)=>{
+          if (err) log('ERROR'.red, 'Terminé pero no pude guardar cursor en DB:', err);
+          else log('Terminé.')
+        });
+      }
+      else {
+        nextMail++;
+        log(`Continuando con #${nextMail}`);
+        client.retr(nextMail);
+      }
     }
 
     client.on("list", function(status, msgcount, msgnumber, data, rawdata) {
@@ -105,15 +116,32 @@ module.exports = {
     		log("LIST failed");
     		client.quit();
     	} else if (msgcount > 0) {
-        log("LIST success with " + msgcount + " message(s)");
+        // log("LIST success with " + msgcount + " message(s)");
         db.all('SELECT * from config where param="UltimoMail"', function (err, r) {
-          let ultimo = r[0].value;
-          log(`ultimo mail es ${ultimo}, debo leer ${msgcount-ultimo}`);
-          nextMail = 100;
-          // continuar();
+          nextMail = r[0].value;
+          lastMail = msgcount;
+
+          //comprobar si se eliminaron mails y sino comenzar comprobación
+          if (nextMail>lastMail) {
+            let dif = nextMail;
+            log(`Detecté que se borraron ${nextMail-lastMail}, esto podría causar confusión.`);
+            nextMail=lastMail;
+            db.run(`UPDATE config set value='${lastMail}' where param='UltimoMail'`, (err)=>{
+              if (err) log('ERROR'.red, 'no pude guardar cursor en DB:', err);
+              else log(`Actualicé cursor en DB: ${dif}->${lastMail}`.green)
+            });
+          }
+          else {
+            if (nextMail==lastMail) log(`No hay nuevos mails que procesar (último: ${lastMail})`);
+            else {
+              log(`Procesando ${msgcount-nextMail} correo${msgcount-nextMail>1?'s':''} nuevos.`);
+              continuar();
+            }
+          } //nextMail=lastMail
+
         });
     	} else {
-    		log("LIST success with 0 message(s)");
+    		log("Bandeja de entrada está vacía.");
     		client.quit();
     	}
     });
@@ -126,11 +154,11 @@ module.exports = {
         var subj = data.match(/Subject: (.+)/);
         if (subj) subj = subj[1]; else { omitir=true; log('Omitiendo correo sin subject'.cyan); }
         var date = data.match(/\nDate: (.+)/);
-        if (date && !omitir) date = new Date(date[1]); { omitir=true; log(`Omitiendo correo sin fecha: "${subj}"`.cyan); }
+        // if (date && !omitir) date = new Date(date[1]); { omitir=true; log(`Omitiendo correo sin fecha: "${subj}"`.cyan); }
 
         // contenido
         if (!omitir && !data.match(/Content-Type:/)) {
-          log(`Procesando correo sin Content-Type: ${subj}`.cyan)
+          // log(`Procesando correo sin Content-Type: ${subj}`.cyan)
           txt = data;
         } else {
           var txt = data.split('Content-Type: text/plain; charset=UTF-8')[1];
@@ -159,21 +187,19 @@ module.exports = {
             log(`Contacto de "${persona.nombre}" (${persona.email}), buscando condición..`.yellow);
 
             condi.check((tipo, criterio) => {
-              log(`"${criterio.mensaje}"`.green);
-              // enviarAviso(persona, criterio.mensaje);
+              log(`Enviando mail: "${criterio.mensaje}"`.green);
+              enviarAviso(persona, criterio.mensaje);
             });
 
           } catch (e) { log('Error procesando formulario!', e); }
         } else { log(`Omitiendo mail que no es contacto: "${subj}"`.cyan); }
-
-        // log('Parsed data: ' + data)
 
         if (msgnumber !== undefined) { // client.dele(msgnumber)
           // client.quit(); //esto estaba bien, pero por pruebas de ver todo lo comento
         }
       } else {
         log('RETR failed for msgnumber ' + msgnumber);
-        // client.quit();
+        client.quit();
       }
       continuar();
     });
@@ -189,9 +215,7 @@ module.exports = {
     });
 
     client.on('rset', function (status, rawdata) {
-      // client.quit();
       log('fin')
-      // client.retr(currentMail);
     });
 
     client.on('quit', function (status, rawdata) {

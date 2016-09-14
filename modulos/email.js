@@ -23,13 +23,14 @@ const enabletls = true;
 const username = process.env.AutoresponderUSER;
 const password = process.env.AutoresponderPASS;
 var currentMail = 1;
-var totalMails= 1;
+var nextMail = 0;
 
 
 if (!username) {
-  log('ERROR'.white.bgRed+' Debes definir usuario/clave en variables de entorno! (~/.profile)'.yellow);
-  log('  export AutoresponderUSER="usuario@gmail.com"');
-  log('  export AutoresponderPASS="password"');
+  log('   ERROR   '.white.bgRed);
+  log('Debes definir usuario/clave en variables de entorno. En ~/.profile:'.yellow);
+  log('export AutoresponderUSER="usuario@gmail.com"');
+  log('export AutoresponderPASS="password"\n');
   process.exit();
 }
 
@@ -94,16 +95,23 @@ module.exports = {
     	}
     });
 
+    let continuar = ()=>{
+      log('Continuando con ', nextMail);
+      client.retr(nextMail);
+    }
+
     client.on("list", function(status, msgcount, msgnumber, data, rawdata) {
     	if (status === false) {
     		log("LIST failed");
     		client.quit();
     	} else if (msgcount > 0) {
-        totalMails = msgcount;
-    		currentMail = msgcount;
-    		let currentmsg = 1;
-    		log("LIST success with " + msgcount + " message(s)");
-        client.retr(currentMail);
+        log("LIST success with " + msgcount + " message(s)");
+        db.all('SELECT * from config where param="UltimoMail"', function (err, r) {
+          let ultimo = r[0].value;
+          log(`ultimo mail es ${ultimo}, debo leer ${msgcount-ultimo}`);
+          nextMail = 100;
+          // continuar();
+        });
     	} else {
     		log("LIST success with 0 message(s)");
     		client.quit();
@@ -165,16 +173,9 @@ module.exports = {
         }
       } else {
         log('RETR failed for msgnumber ' + msgnumber);
-        client.quit();
+        // client.quit();
       }
-      if (currentMail>200) {
-        currentMail--;
-        log('NEXT', currentMail);
-        client.dele(msgnumber); //test por ahora
-        // client.retr(currentMail);
-      } else {
-        log('FIN')
-      }
+      continuar();
     });
 
     client.on('dele', function (status, msgnumber, data, rawdata) {

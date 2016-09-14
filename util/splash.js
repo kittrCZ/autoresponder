@@ -11,7 +11,7 @@ process.on('SIGINT',()=>{
   process.exit();
 })
 
-process.on('SIGUSR2',()=>{
-  console.log('  Reiniciando via Nodemon  \n'.bgRed.white);
-  process.exit();
-})
+// process.on('SIGUSR2',()=>{
+//   console.log('  Reiniciando via Nodemon  \n'.bgRed.white);
+//   process.exit();
+// })

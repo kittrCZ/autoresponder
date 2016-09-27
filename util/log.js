@@ -8,7 +8,7 @@
  */
 
 'use strict';
-const config = require('../config.js')
+const config = require('../config')
 const colors = require('colors');
 const cl = ['red', 'green', 'yellow', 'magenta', 'cyan', 'blue', 'white'];
 
